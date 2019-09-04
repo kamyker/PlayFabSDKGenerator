@@ -11,7 +11,7 @@ exports.makeCombinedAPI = function (apis, sourceDir, apiOutputDir) {
     var defaultUnitySubFolder = "Source/PlayFabSDK";
 
     exports.MakeUnityV2Sdk(apis, sourceDir, path.resolve(apiOutputDir, sdkGeneratorGlobals.unitySubfolder ? sdkGeneratorGlobals.unitySubfolder : defaultUnitySubFolder));
-    makeTestingFiles(apis, sourceDir, apiOutputDir);
+    //makeTestingFiles(apis, sourceDir, apiOutputDir);
 }
 
 // This function is additionally called from the csharp-unity-gameserver target
@@ -26,7 +26,7 @@ exports.MakeUnityV2Sdk = function (apis, sourceDir, apiOutputDir) {
     };
 
     templatizeTree(locals, path.resolve(sourceDir, "source"), apiOutputDir);
-    makeSharedEventFiles(apis, sourceDir, apiOutputDir);
+    //makeSharedEventFiles(apis, sourceDir, apiOutputDir);
     makeDatatypes(apis, sourceDir, apiOutputDir);
     for (var i = 0; i < apis.length; i++) {
         makeApi(apis[i], sourceDir, apiOutputDir);
@@ -34,39 +34,39 @@ exports.MakeUnityV2Sdk = function (apis, sourceDir, apiOutputDir) {
     }
 }
 
-function makeTestingFiles(apis, sourceDir, apiOutputDir) {
-    var testingOutputDir = path.resolve(apiOutputDir, "Testing");
+//function makeTestingFiles(apis, sourceDir, apiOutputDir) {
+//    var testingOutputDir = path.resolve(apiOutputDir, "Testing");
 
-    var locals = {
-    };
+//    var locals = {
+//    };
 
-    templatizeTree(locals, path.resolve(sourceDir, "Testing"), testingOutputDir);
-}
+//    templatizeTree(locals, path.resolve(sourceDir, "Testing"), testingOutputDir);
+//}
 
-function makeApiEventFiles(api, sourceDir, apiOutputDir) {
-    var apiLocals = {
-        api: api,
-        getApiDefineFlag: getApiDefineFlag
-    };
+//function makeApiEventFiles(api, sourceDir, apiOutputDir) {
+//    var apiLocals = {
+//        api: api,
+//        getApiDefineFlag: getApiDefineFlag
+//    };
 
-    var apiTemplate = getCompiledTemplate(path.resolve(sourceDir, "templates", "PlayFabEvents.cs.ejs"));
-    writeFile(path.resolve(apiOutputDir, api.name + "/PlayFabEvents.cs"), apiTemplate(apiLocals));
-}
+//    var apiTemplate = getCompiledTemplate(path.resolve(sourceDir, "templates", "PlayFabEvents.cs.ejs"));
+//    writeFile(path.resolve(apiOutputDir, api.name + "/PlayFabEvents.cs"), apiTemplate(apiLocals));
+//}
 
-function makeSharedEventFiles(apis, sourceDir, apiOutputDir) {
-    var eventLocals = {
-        apis: apis,
-        sourceDir: sourceDir,
-        generateApiSummary: generateApiSummary,
-        getApiDefineFlag: getApiDefineFlag,
-        getDeprecationAttribute: getDeprecationAttribute,
-        getPropertyDef: getModelPropertyDef
-    };
+//function makeSharedEventFiles(apis, sourceDir, apiOutputDir) {
+//    var eventLocals = {
+//        apis: apis,
+//        sourceDir: sourceDir,
+//        generateApiSummary: generateApiSummary,
+//        getApiDefineFlag: getApiDefineFlag,
+//        getDeprecationAttribute: getDeprecationAttribute,
+//        getPropertyDef: getModelPropertyDef
+//    };
 
-    // Events for api-callbacks
-    var eventTemplate = getCompiledTemplate(path.resolve(sourceDir, "templates", "Events.cs.ejs"));
-    writeFile(path.resolve(apiOutputDir, "Shared/Public/PlayFabEvents.cs"), eventTemplate(eventLocals));
-}
+//    // Events for api-callbacks
+//    var eventTemplate = getCompiledTemplate(path.resolve(sourceDir, "templates", "Events.cs.ejs"));
+//    writeFile(path.resolve(apiOutputDir, "Shared/Public/PlayFabEvents.cs"), eventTemplate(eventLocals));
+//}
 
 function getBaseTypeSyntax(datatype) {
     if (datatype.isResult && datatype.className === "LoginResult" || datatype.className === "RegisterPlayFabUserResult")
@@ -132,8 +132,8 @@ function makeApi(api, sourceDir, apiOutputDir) {
     var apiTemplate = getCompiledTemplate(path.resolve(templateDir, "PlayFab_API.cs.ejs"));
     writeFile(path.resolve(apiOutputDir, api.name + "/PlayFab" + api.name + "API.cs"), apiTemplate(locals));
 
-    var eventTemplate = getCompiledTemplate(path.resolve(sourceDir, "templates", "PlayFabEvents.cs.ejs"));
-    writeFile(path.resolve(apiOutputDir, api.name + "/PlayFabEvents.cs"), eventTemplate(locals));
+    //var eventTemplate = getCompiledTemplate(path.resolve(sourceDir, "templates", "PlayFabEvents.cs.ejs"));
+    //writeFile(path.resolve(apiOutputDir, api.name + "/PlayFabEvents.cs"), eventTemplate(locals));
 }
 
 function makeInstanceApi(api, sourceDir, apiOutputDir) {
