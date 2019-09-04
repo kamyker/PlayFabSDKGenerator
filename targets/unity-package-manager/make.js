@@ -12,6 +12,7 @@ exports.makeCombinedAPI = function (apis, sourceDir, apiOutputDir) {
 
     exports.MakeUnityV2Sdk(apis, sourceDir, path.resolve(apiOutputDir, sdkGeneratorGlobals.unitySubfolder ? sdkGeneratorGlobals.unitySubfolder : defaultUnitySubFolder));
     //makeTestingFiles(apis, sourceDir, apiOutputDir);
+    makePackage(sourceDir, apiOutputDir, sdkGlobals.sdkVersion);
 }
 
 // This function is additionally called from the csharp-unity-gameserver target
@@ -32,6 +33,17 @@ exports.MakeUnityV2Sdk = function (apis, sourceDir, apiOutputDir) {
         makeApi(apis[i], sourceDir, apiOutputDir);
         makeInstanceApi(apis[i], sourceDir, apiOutputDir);
     }
+}
+
+function makePackage(sourceDir, apiOutputDir, sdkVersion) {
+    var templateDir = path.resolve(sourceDir, "templates");
+    var packageTemplate = getCompiledTemplate(path.resolve(templateDir, "package.json.ejs"));
+
+    var packageLocal = {
+        sdkVersion: sdkVersion
+    };
+
+    writeFile(path.resolve(apiOutputDir, "package.json"), packageTemplate(packageLocal));
 }
 
 //function makeTestingFiles(apis, sourceDir, apiOutputDir) {
