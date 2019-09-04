@@ -408,6 +408,10 @@ function generateApis(buildIdentifier, target) {
     if (target.versionKey && !target.versionString) {
         var apiNotes = getApiJson("SdkManualNotes");
         target.versionString = apiNotes.sdkVersion[target.versionKey];
+
+        //small cheat to use unity-v2 version
+        if (target.versionKey == "unity-package-manager")
+            target.versionString = apiNotes.sdkVersion["unity-v2"];
     }
     console.log("BuildTarget: " + JSON.stringify(target));
     sdkGlobals.sdkVersion = target.versionString;
