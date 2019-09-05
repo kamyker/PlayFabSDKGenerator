@@ -142,11 +142,12 @@ function makeApi(api, sourceDir, apiOutputDir) {
         hasEntityTokenOptions: getAuthMechanisms([api]).includes("EntityToken"),
         hasClientOptions: getAuthMechanisms([api]).includes("SessionTicket"),
         isPartial: isPartial(api.name),
-        getParametersPropertyDef: getParametersPropertyDef
+        getParametersPropertyDef,
+        getParametersPropertyMethodDescription
     };
 
     var apiTemplate = getCompiledTemplate(path.resolve(templateDir, "PlayFab_API.cs.ejs"));
-    writeFile(path.resolve(apiOutputDir, api.name + "/PlayFab" + api.name + "API.cs"), apiTemplate(locals));
+    writeFile(path.resolve(apiOutputDir, api.name + "/" + api.name + "API.cs"), apiTemplate(locals));
 
     //var eventTemplate = getCompiledTemplate(path.resolve(sourceDir, "templates", "PlayFabEvents.cs.ejs"));
     //writeFile(path.resolve(apiOutputDir, api.name + "/PlayFabEvents.cs"), eventTemplate(locals));
@@ -287,6 +288,18 @@ function getParametersPropertyDef(datatype) {
     }
 
     return parameters;
+}
+
+function getParametersPropertyMethodDescription(tabbing, datatype) {
+    var desc = "";
+    for (var i = 0; i < datatype.properties.length; i++)
+    { 
+        var property = datatype.properties[i];
+        desc += tabbing + '/// <param name="' + property.name +'">' + property.description;
+        desc += property.optional ? ' (Optional)' : ' (Required)' ;
+        desc += '</param>' + "\n";
+    }
+    return desc;
 }
 
 function getPropertyCsType(property, datatype, needOptional) {

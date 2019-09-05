@@ -156,7 +156,7 @@ namespace PlayFab.Public
         /// </summary>
         public void Send()
         {
-            if ((PlayFabClientAPI.IsClientLoggedIn()) && (isSending == false))
+            if ((ClientAPI.IsClientLoggedIn()) && (isSending == false))
             {
                 isSending = true;
 
@@ -175,7 +175,7 @@ namespace PlayFab.Public
                     {
                         try
                         {
-                            await PlayFabEventsAPI.WriteEvents(request.Events, request);
+                            await EventsAPI.WriteEvents(request.Events);
                         }
                         catch (PlayFabError e)
                         {
