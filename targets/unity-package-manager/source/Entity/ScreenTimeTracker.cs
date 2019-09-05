@@ -175,7 +175,7 @@ namespace PlayFab.Public
                     {
                         try
                         {
-                            await PlayFabEventsAPI.Send(request);
+                            await PlayFabEventsAPI.WriteEvents(request.Events, request);
                         }
                         catch (PlayFabError e)
                         {

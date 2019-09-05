@@ -33,6 +33,9 @@ exports.MakeUnityV2Sdk = function (apis, sourceDir, apiOutputDir) {
         makeApi(apis[i], sourceDir, apiOutputDir);
         makeInstanceApi(apis[i], sourceDir, apiOutputDir);
     }
+    //for (var i = 0; i < apis.length; i++) {
+    //console.log(JSON.stringify(apis[0].datatypes, null, 2));
+    //}
 }
 
 function makePackage(sourceDir, apiOutputDir, sdkVersion) {
@@ -138,7 +141,8 @@ function makeApi(api, sourceDir, apiOutputDir) {
         getCustomApiFunction: getCustomApiFunction,
         hasEntityTokenOptions: getAuthMechanisms([api]).includes("EntityToken"),
         hasClientOptions: getAuthMechanisms([api]).includes("SessionTicket"),
-        isPartial: isPartial(api.name)
+        isPartial: isPartial(api.name),
+        getParametersPropertyDef: getParametersPropertyDef
     };
 
     var apiTemplate = getCompiledTemplate(path.resolve(templateDir, "PlayFab_API.cs.ejs"));
@@ -258,6 +262,31 @@ function getModelPropertyDef(property, datatype) {
 
     basicType = getPropertyCsType(property, datatype, true);
     return basicType + " " + property.name;
+}
+
+function getParametersPropertyDef(datatype) {
+
+    datatype.properties.sort(function(a, b) {
+        if (a.optional && !b.optional) 
+            return 1;
+        if (!a.optional && b.optional) 
+            return -1;
+        return 0;
+    });
+    
+    var parameters = "";
+    for (var i = 0; i < datatype.properties.length; i++)
+    { 
+        var property = datatype.properties[i];
+        var typeWithName = getModelPropertyDef(property, datatype);
+        parameters += typeWithName;
+        if(property.optional)
+            parameters += " = default, ";
+        else
+            parameters += ", ";
+    }
+
+    return parameters;
 }
 
 function getPropertyCsType(property, datatype, needOptional) {

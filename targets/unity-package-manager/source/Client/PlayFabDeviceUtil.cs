@@ -26,7 +26,7 @@ namespace PlayFab.Internal
                 clientInstanceApi.AttributeInstall(attribRequest, OnAttributeInstall, null, settings);
             else
             {
-                var res = await PlayFabClientAPI.Send(attribRequest, settings);
+                var res = await PlayFabClientAPI.AttributeInstall(request: attribRequest, customData: settings);
                 OnAttributeInstall(res);
             }
         }
@@ -55,7 +55,7 @@ namespace PlayFab.Internal
             {
                 try
                 {
-                    await PlayFabClientAPI.Send(request, settings);
+                    await PlayFabClientAPI.ReportDeviceInfo(request: request, customData: settings);
                 }
                 catch (PlayFabError e)
                 {

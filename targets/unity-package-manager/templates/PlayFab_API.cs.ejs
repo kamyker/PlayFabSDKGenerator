@@ -41,20 +41,32 @@ namespace PlayFab
 
         private static PlayFabAuthenticationContext GetContext(SharedModels.PlayFabRequestCommon request) => (request == null ? null : request.AuthenticationContext) ?? PlayFabSettings.staticPlayer;
 
-<% var apiRequestsAdded =[]; for(var i in api.calls) 
+<% for(var i in api.calls)
 { 
-	var apiCall = api.calls[i]; 
-	%><%- generateApiSummary("        ", apiCall, "summary") 
-	%><%- getDeprecationAttribute("        ", apiCall)
-%>        public static Task<<%- apiCall.result %>> <% if(apiRequestsAdded.includes(apiCall.request)) { %><%- apiCall.name %><% } else { %>Send<% } %>(<%- apiCall.request %> request, object customData = null, Dictionary<string, string> extraHeaders = null)
+    var apiCall = api.calls[i]; 
+    var datatype = api.datatypes[apiCall.request]; -%>
+<%- generateApiSummary("        ", apiCall, "summary") -%>
+<%- getDeprecationAttribute("        ", apiCall) -%>
+        public static Task<<%- apiCall.result %>> <%- apiCall.name %>(<%- getParametersPropertyDef(datatype) %>
+            <%- apiCall.request %> request = default, object customData = null, Dictionary<string, string> extraHeaders = null)
         {
+            if(request == null)
+                request = new <%- apiCall.request %>();
+<% for(var p of datatype.properties)
+   { -%>
+            if(<%- p.name %> != default)
+                request.<%- p.name %> = <%- p.name %>;
+<% } -%>
+
             var context = GetContext(request);
-<%- getRequestActions("            ", apiCall) %><%-
-	getCustomApiLogic("            ", apiCall) %>
-            return PlayFabHttp.MakeApiCallAsync<<%- apiCall.result %>>("<%- apiCall.url %>", request, <%- getAuthParams(apiCall) %>, customData, extraHeaders, context);
+<%- getRequestActions("            ", apiCall) -%>
+<%-getCustomApiLogic("            ", apiCall) %>
+            return PlayFabHttp.MakeApiCallAsync<<%- apiCall.result %>>("<%- apiCall.url %>", request,
+				<%- getAuthParams(apiCall) %>,
+				customData, extraHeaders, context);
         }<%- getCustomApiFunction("        ", api, apiCall) %>
 
-<% apiRequestsAdded.push(apiCall.request); } %>
+<% } %>
     }
 }
 
