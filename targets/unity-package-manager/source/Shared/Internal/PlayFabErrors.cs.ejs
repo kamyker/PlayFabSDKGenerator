@@ -16,7 +16,7 @@ namespace PlayFab
         <% } %><% var errorProps = errors[errorList[errorList.length-1]] %><%- errorProps.name %> = <%- errorProps.id %>
     }
 
-    public class PlayFabError
+    public class PlayFabError : Exception
     {
         public string ApiEndpoint;
         public int HttpCode;

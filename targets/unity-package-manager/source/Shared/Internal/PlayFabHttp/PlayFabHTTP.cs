@@ -6,6 +6,7 @@ using PlayFab.Json;
 using PlayFab.Public;
 using PlayFab.SharedModels;
 using UnityEngine;
+using System.Threading.Tasks;
 
 namespace PlayFab.Internal
 {
@@ -134,6 +135,21 @@ namespace PlayFab.Internal
             apiSettings = apiSettings ?? PlayFabSettings.staticSettings;
             var fullUrl = apiSettings.GetFullUrl(apiEndpoint, apiSettings.RequestGetParams);
             _MakeApiCall(apiEndpoint, fullUrl, request, authType, resultCallback, errorCallback, customData, extraHeaders, false, authenticationContext, apiSettings, instanceApi);
+        }
+
+        protected internal static Task<TResult> MakeApiCallAsync<TResult>(string apiEndpoint,
+            PlayFabRequestCommon request, AuthType authType, object customData = null, Dictionary<string, string> extraHeaders = null, PlayFabAuthenticationContext authenticationContext = null, PlayFabApiSettings apiSettings = null, IPlayFabInstanceApi instanceApi = null)
+            where TResult : PlayFabResultCommon
+        {
+            TaskCompletionSource<TResult> tcs = new TaskCompletionSource<TResult>();
+            apiSettings = apiSettings ?? PlayFabSettings.staticSettings;
+            var fullUrl = apiSettings.GetFullUrl(apiEndpoint, apiSettings.RequestGetParams);
+            _MakeApiCall(apiEndpoint, fullUrl, request, authType, (TResult a) => tcs.SetResult(a), error =>
+            {
+                Debug.LogError(error.GenerateErrorReport());
+                tcs.SetException(error);
+            }, customData, extraHeaders, false, authenticationContext, apiSettings, instanceApi);
+            return tcs.Task;
         }
 
         protected internal static void MakeApiCallWithFullUri<TResult>(string fullUri,

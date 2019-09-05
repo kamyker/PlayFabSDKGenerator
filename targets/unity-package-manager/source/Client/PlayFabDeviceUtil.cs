@@ -11,7 +11,7 @@ namespace PlayFab.Internal
         private static bool _needsAttribution, _gatherDeviceInfo, _gatherScreenTime;
 
         #region Make Attribution API call
-        private static void DoAttributeInstall(PlayFabApiSettings settings, IPlayFabInstanceApi instanceApi)
+        private static async void DoAttributeInstall(PlayFabApiSettings settings, IPlayFabInstanceApi instanceApi)
         {
             if (!_needsAttribution || settings.DisableAdvertising)
                 return; // Don't send this value to PlayFab if it's not required
@@ -25,7 +25,10 @@ namespace PlayFab.Internal
             if (clientInstanceApi != null)
                 clientInstanceApi.AttributeInstall(attribRequest, OnAttributeInstall, null, settings);
             else
-                PlayFabClientAPI.AttributeInstall(attribRequest, OnAttributeInstall, null, settings);
+            {
+                var res = await PlayFabClientAPI.Send(attribRequest, settings);
+                OnAttributeInstall(res);
+            }
         }
         private static void OnAttributeInstall(ClientModels.AttributeInstallResult result)
         {
@@ -36,7 +39,7 @@ namespace PlayFab.Internal
         #endregion Make Attribution API call
 
         #region Scrape Device Info
-        private static void SendDeviceInfoToPlayFab(PlayFabApiSettings settings, IPlayFabInstanceApi instanceApi)
+        private static async void SendDeviceInfoToPlayFab(PlayFabApiSettings settings, IPlayFabInstanceApi instanceApi)
         {
             if (settings.DisableDeviceInfo || !_gatherDeviceInfo) return;
 
@@ -47,13 +50,19 @@ namespace PlayFab.Internal
             };
             var clientInstanceApi = instanceApi as PlayFabClientInstanceAPI;
             if (clientInstanceApi != null)
-                clientInstanceApi.ReportDeviceInfo(request, null, OnGatherFail, settings);
+                clientInstanceApi.ReportDeviceInfo(request, null, e => Debug.Log("OnGatherFail: " + e.GenerateErrorReport()), settings);
             else
-                PlayFabClientAPI.ReportDeviceInfo(request, null, OnGatherFail, settings);
-        }
-        private static void OnGatherFail(PlayFabError error)
-        {
-            Debug.Log("OnGatherFail: " + error.GenerateErrorReport());
+            {
+                try
+                {
+                    await PlayFabClientAPI.Send(request, settings);
+                }
+                catch (PlayFabError e)
+                {
+                    Debug.Log("OnGatherFail: " + e.GenerateErrorReport());
+                }
+
+            }
         }
         #endregion
 

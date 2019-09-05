@@ -171,21 +171,31 @@ namespace PlayFab.Public
 
                 if (request.Events.Count > 0)
                 {
-                    PlayFabEventsAPI.WriteEvents(request, EventSentSuccessfulCallback, EventSentErrorCallback);
+                    System.Threading.Tasks.Task.Run(async () =>
+                    {
+                        try
+                        {
+                            await PlayFabEventsAPI.Send(request);
+                        }
+                        catch (PlayFabError e)
+                        {
+                            EventSentErrorCallback(e);
+                        }
+                    });
                 }
 
                 isSending = false;
             }
         }
 
-        /// <summary>
-        /// Callback to handle successful server interaction.
-        /// </summary>
-        /// <param name="response">Server response</param>
-        private void EventSentSuccessfulCallback(EventsModels.WriteEventsResponse response)
-        {
-            // add code to work with successful callback
-        }
+        ///// <summary>
+        ///// Callback to handle successful server interaction.
+        ///// </summary>
+        ///// <param name="response">Server response</param>
+        //private void EventSentSuccessfulCallback(EventsModels.WriteEventsResponse response)
+        //{
+        //    // add code to work with successful callback
+        //}
 
         /// <summary>
         /// Callback to handle unsuccessful server interaction.

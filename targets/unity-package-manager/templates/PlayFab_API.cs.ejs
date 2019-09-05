@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using PlayFab.<%- api.name %>Models;
 using PlayFab.Internal;
+using System.Threading.Tasks;
 
 namespace PlayFab
 {
@@ -38,16 +39,22 @@ namespace PlayFab
             PlayFabSettings.staticPlayer.ForgetAllCredentials();
         }
 
-<% for(var i in api.calls) { var apiCall = api.calls[i]; %><%- generateApiSummary("        ", apiCall, "summary") %><%- getDeprecationAttribute("        ", apiCall)
-%>        public static void <%- apiCall.name %>(<%- apiCall.request %> request, Action<<%- apiCall.result %>> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
+        private static PlayFabAuthenticationContext GetContext(SharedModels.PlayFabRequestCommon request) => (request == null ? null : request.AuthenticationContext) ?? PlayFabSettings.staticPlayer;
+
+<% var apiRequestsAdded =[]; for(var i in api.calls) 
+{ 
+	var apiCall = api.calls[i]; 
+	%><%- generateApiSummary("        ", apiCall, "summary") 
+	%><%- getDeprecationAttribute("        ", apiCall)
+%>        public static Task<<%- apiCall.result %>> <% if(apiRequestsAdded.includes(apiCall.request)) { %><%- apiCall.name %><% } else { %>Send<% } %>(<%- apiCall.request %> request, object customData = null, Dictionary<string, string> extraHeaders = null)
         {
-            var context = (request == null ? null : request.AuthenticationContext) ?? PlayFabSettings.staticPlayer;
-<%- getRequestActions("            ", apiCall) %>
-<%- getCustomApiLogic("            ", apiCall) %>
-            PlayFabHttp.MakeApiCall("<%- apiCall.url %>", request, <%- getAuthParams(apiCall) %>, resultCallback, errorCallback, customData, extraHeaders, context);
+            var context = GetContext(request);
+<%- getRequestActions("            ", apiCall) %><%-
+	getCustomApiLogic("            ", apiCall) %>
+            return PlayFabHttp.MakeApiCallAsync<<%- apiCall.result %>>("<%- apiCall.url %>", request, <%- getAuthParams(apiCall) %>, customData, extraHeaders, context);
         }<%- getCustomApiFunction("        ", api, apiCall) %>
 
-<% } %>
+<% apiRequestsAdded.push(apiCall.request); } %>
     }
 }
 
