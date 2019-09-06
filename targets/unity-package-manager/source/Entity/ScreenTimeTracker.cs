@@ -196,34 +196,34 @@ namespace PlayFab.Public
         //     Debug.LogWarning("Failed to send session data. Error: " + response.GenerateErrorReport());
         // }
 
-        // #region Unused MonoBehaviour compatibility  methods
-        // /// <summary>
-        // /// Unused
-        // /// Name mimics MonoBehaviour method, for ease of integration.
-        // /// </summary>
-        // public void OnEnable()
-        // {
-        //     // add code sending events on enable
-        // }
+        #region Unused MonoBehaviour compatibility  methods
+        /// <summary>
+        /// Unused
+        /// Name mimics MonoBehaviour method, for ease of integration.
+        /// </summary>
+        public void OnEnable()
+        {
+            // add code sending events on enable
+        }
 
-        // /// <summary>
-        // /// Unused
-        // /// Name mimics MonoBehaviour method, for ease of integration.
-        // /// </summary>
-        // public void OnDisable()
-        // {
-        //     // add code sending events on disable
-        // }
+        /// <summary>
+        /// Unused
+        /// Name mimics MonoBehaviour method, for ease of integration.
+        /// </summary>
+        public void OnDisable()
+        {
+            // add code sending events on disable
+        }
 
-        // /// <summary>
-        // /// Unused
-        // /// Name mimics MonoBehaviour method, for ease of integration.
-        // /// </summary>
-        // public void OnDestroy()
-        // {
-        //     // add code sending events on destroy
-        // }
-        // #endregion
+        /// <summary>
+        /// Unused
+        /// Name mimics MonoBehaviour method, for ease of integration.
+        /// </summary>
+        public void OnDestroy()
+        {
+            // add code sending events on destroy
+        }
+        #endregion
 
         // /// <summary>
         // /// Trying to send event during game exit. Note: works only on certain platforms.
